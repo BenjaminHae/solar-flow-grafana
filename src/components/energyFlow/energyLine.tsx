@@ -10,17 +10,18 @@ interface EnergyLinesProps {
  extraEnergyPoint: PointPosition;
  linesColor: string;
  alwaysShowAdditionalSource: boolean;
+ showEnergyThreshold: number;
 }
 
 
-export const EnergyLines: React.FC<EnergyLinesProps> = ({flow, pvPoint, loadPoint, gridPoint, extraEnergyPoint, linesColor, alwaysShowAdditionalSource}) => {
+export const EnergyLines: React.FC<EnergyLinesProps> = ({flow, pvPoint, loadPoint, gridPoint, extraEnergyPoint, linesColor, alwaysShowAdditionalSource, showEnergyThreshold}) => {
   return (
     <>
       <EmptyLine start={{x: pvPoint.x + 2, y: loadPoint.y}} end={gridPoint}/>
       <EmptyLine start={pvPoint} end={{x: pvPoint.x, y: loadPoint.y - 2}}/>
       <EmptyLine start={{x: pvPoint.x - 2, y: loadPoint.y}} end={loadPoint}/>
 
-      {flow.additionalSource !== 0 || alwaysShowAdditionalSource && (
+      { Math.abs(flow.additionalSource) > showEnergyThreshold || alwaysShowAdditionalSource && (
         <>
           <EmptyLine start={extraEnergyPoint} end={{x: pvPoint.x, y: loadPoint.y + 2}}/>
           <EnergyLine start={extraEnergyPoint} end={{x: pvPoint.x, y: loadPoint.y }} linesColor={linesColor} className={flow.additionalSource < 0 ? "animated-line" : "animated-line-reverse"}/>
@@ -28,13 +29,22 @@ export const EnergyLines: React.FC<EnergyLinesProps> = ({flow, pvPoint, loadPoin
       }
 
       {/*Grid line*/}
-      <EnergyLine start={{x: pvPoint.x, y: loadPoint.y}} end={gridPoint} linesColor={linesColor} className={flow.grid < 0 ? "animated-line-reverse" : "animated-line"}/>
+      { Math.abs(flow.grid) >= showEnergyThreshold && (
+          <EnergyLine start={{x: pvPoint.x, y: loadPoint.y}} end={gridPoint} linesColor={linesColor} className={flow.grid < 0 ? "animated-line-reverse" : "animated-line"}/>
+        )
+      }
 
       {/*Solar line*/}
-      <EnergyLine start={pvPoint} end={{x: pvPoint.x, y: loadPoint.y}} linesColor={linesColor} className="animated-line-reverse"/>
+      { flow.pv >= showEnergyThreshold && (
+          <EnergyLine start={pvPoint} end={{x: pvPoint.x, y: loadPoint.y}} linesColor={linesColor} className="animated-line-reverse"/>
+        )
+      }
 
       {/*Load line*/}
-      <EnergyLine start={{x: pvPoint.x, y: loadPoint.y}} end={loadPoint} linesColor={linesColor} className="animated-line-reverse"/>
+      { flow.load >= showEnergyThreshold && (
+          <EnergyLine start={{x: pvPoint.x, y: loadPoint.y}} end={loadPoint} linesColor={linesColor} className="animated-line-reverse"/>
+        )
+      }
 
 
     </>
