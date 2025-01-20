@@ -111,7 +111,7 @@ export const EnergyFlow: React.FC<EnergyFlowProps> = ({data, options}) => {
             <Point label="PV" measurementUnit={options.measurementUnit} showLegend={false} value={flowData.pv}
                    style={customPoint(theme.visualization.getColorByName(options.solarColor))} icon={icons["solarPanel"]} />
           </div>
-          { Math.abs(flowData.additionalSource) > options.showEnergyThreshold || flowData.additionalSourceSOC !== 0 || options.additionalSourceAlwaysShow && (
+          { (Math.abs(flowData.additionalSource) > options.showEnergyThreshold || flowData.additionalSourceSOC !== 0 || options.additionalSourceAlwaysShow) && (
             <div className="point-holder" style={{ position: 'absolute', top: '100px', left: '150px' }}>
               <Point label={options.additionalSourceLabel} measurementUnit={options.measurementUnit} showLegend={options.showLegend} value={flowData.additionalSource}
                      subValue={flowData.additionalSourceSOC}
